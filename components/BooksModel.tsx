@@ -15,7 +15,7 @@ export interface ItemsEntity {
 }
 export interface VolumeInfo {
     title: string;
-    authors?: (string)[] | null;
+    authors?: string[] | null;
     publisher: string;
     publishedDate: string;
     description: string;
