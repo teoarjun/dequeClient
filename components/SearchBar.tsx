@@ -18,52 +18,51 @@ const SearchBar = () => {
   const displayOptions: number[] = [40, 20, 10, 5]
 
   React.useEffect(() => {
-    handleSearch()
-  }, [currentPage, maxResults])
-
-
-  const getMostPopularAuthor = (allAuthors: string[]) => {
-    //1. getMostPopularAuthor
-    const author = allAuthors.sort((a, b) =>
-      allAuthors.filter(v => v === a).length
-      - allAuthors.filter(v => v === b).length
-    ).pop();
-    setmostPopularAuthor(author || "")
-  }
-  const calculateStats = (data: BooksResult) => {
-    if (data.totalItems > 0 && data.items) {
-      const allAuthors: string[] = []
-      const allPublishedDates: string[] = []
-      data.items.forEach((item: ItemsEntity) => {
-        if (Array.isArray(item.volumeInfo.authors)) {
-          allAuthors.push(...item.volumeInfo.authors)
-          allPublishedDates.push(item.volumeInfo.publishedDate)
-        }
-      })
+    const getMostPopularAuthor = (allAuthors: string[]) => {
       //1. getMostPopularAuthor
-      getMostPopularAuthor(allAuthors)
-      //2. Oldest Published Date
-      setoldestPublishedDate(getPublishedDate(allPublishedDates))
-      setlatestPublishedDate(getPublishedDate(allPublishedDates, false))
+      const author = allAuthors.sort((a, b) =>
+        allAuthors.filter(v => v === a).length
+        - allAuthors.filter(v => v === b).length
+      ).pop();
+      setmostPopularAuthor(author || "")
     }
-  }
+    const calculateStats = (data: BooksResult) => {
+      if (data.totalItems > 0 && data.items) {
+        const allAuthors: string[] = []
+        const allPublishedDates: string[] = []
+        data.items.forEach((item: ItemsEntity) => {
+          if (Array.isArray(item.volumeInfo.authors)) {
+            allAuthors.push(...item.volumeInfo.authors)
+            allPublishedDates.push(item.volumeInfo.publishedDate)
+          }
+        })
+        //1. getMostPopularAuthor
+        getMostPopularAuthor(allAuthors)
+        //2. Oldest Published Date
+        setoldestPublishedDate(getPublishedDate(allPublishedDates))
+        setlatestPublishedDate(getPublishedDate(allPublishedDates, false))
+      }
+    }
+    const handleSearch = async () => {
+      if (searchQuery) {
+        const startTime = new Date();
+        setshowLoader(true)
+        const response = await fetch(`http://localhost:3003/search?keyword=${searchQuery}&maxResults=${maxResults}&startIndex=` + (currentPage * maxResults));
+        const data = await response.json();
+        //calculating stats-
+        //1. Total Results - 1888   Most Popular Author - 1888   Oldest Published Date - 1888   Latest Published Date - 1888   Server Response Time 
+        calculateStats(data)
+        setResults(data);
+        setshowLoader(false)
+        const endTime = new Date();
+        const elapsedTimeInSeconds = (endTime.getTime() - startTime.getTime()) / 1000;
+        setserverResponseTime(elapsedTimeInSeconds.toFixed(2).toString())
+      }
+    };
+    handleSearch()
+  }, [currentPage, maxResults, searchQuery])
 
-  const handleSearch = async () => {
-    if (searchQuery) {
-      const startTime = new Date();
-      setshowLoader(true)
-      const response = await fetch(`http://localhost:3003/search?keyword=${searchQuery}&maxResults=${maxResults}&startIndex=` + (currentPage * maxResults));
-      const data = await response.json();
-      //calculating stats-
-      //1. Total Results - 1888   Most Popular Author - 1888   Oldest Published Date - 1888   Latest Published Date - 1888   Server Response Time 
-      calculateStats(data)
-      setResults(data);
-      setshowLoader(false)
-      const endTime = new Date();
-      const elapsedTimeInSeconds = (endTime.getTime() - startTime.getTime()) / 1000;
-      setserverResponseTime(elapsedTimeInSeconds.toFixed(2).toString())
-    }
-  };
+
   const handleDisplayFilter = (event: ChangeEventHandler<HTMLSelectElement>) => {
     setcurrentPage(0)
     setmaxResults(parseInt(event.target.value))
