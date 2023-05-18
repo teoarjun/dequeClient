@@ -7,6 +7,7 @@ import { debounce } from 'lodash';
 
 
 const SearchBar = () => {
+  const BASE_URL = process.env.API_URL || "http://localhost:3003/"
   const [openIndex, setopenIndex] = useState<number | null>(null);
   const [currentPage, setcurrentPage] = useState<number>(0);
   const [maxResults, setmaxResults] = useState<number>(40);
@@ -44,10 +45,11 @@ const SearchBar = () => {
       }
     }
     const handleSearch = async () => {
+      console.log("arjun", process)
       if (searchQuery) {
         const startTime = new Date();
         setshowLoader(true)
-        const response = await fetch(`http://localhost:3003/search?keyword=${searchQuery}&maxResults=${maxResults}&startIndex=` + (currentPage * maxResults));
+        const response = await fetch(BASE_URL + `/search?keyword=${searchQuery}&maxResults=${maxResults}&startIndex=` + (currentPage * maxResults));
         const data = await response.json();
         //calculating stats-
         //1. Total Results - 1888   Most Popular Author - 1888   Oldest Published Date - 1888   Latest Published Date - 1888   Server Response Time 
@@ -60,7 +62,7 @@ const SearchBar = () => {
       }
     };
     handleSearch()
-  }, [currentPage, maxResults, searchQuery])
+  }, [currentPage, maxResults, searchQuery, BASE_URL])
 
 
   const handleDisplayFilter = (event: ChangeEvent<HTMLSelectElement>) => {
