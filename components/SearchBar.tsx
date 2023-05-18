@@ -7,7 +7,7 @@ import { debounce } from 'lodash';
 
 
 const SearchBar = () => {
-  const BASE_URL = process.env.API_URL || "http://localhost:3003/"
+  const BASE_URL = process.env.API_URL || "http://localhost:3003"
   const [openIndex, setopenIndex] = useState<number | null>(null);
   const [currentPage, setcurrentPage] = useState<number>(0);
   const [maxResults, setmaxResults] = useState<number>(40);
