@@ -1,4 +1,4 @@
-name: Lint Check
+name: Lint, Types & Build Checks
 
 on:
   push:
@@ -26,3 +26,9 @@ jobs:
 
       - name: Run lint check
         run: yarn lint
+
+      - name: Run type check
+        run: yarn tsc
+
+      - name: Run build check
+        run: yarn build
