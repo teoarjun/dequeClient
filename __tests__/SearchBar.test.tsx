@@ -49,7 +49,7 @@ describe('SearchBar', () => {
     await waitFor(() => getAllByTestId('book-item'));
     expect(screen.getByText(/Book 1/i)).toBeInTheDocument();
 
-    const dropdown = await getByTestId('display-filter-dropdown');
+    const dropdown = await getByTestId('display-filter-dropdown') as HTMLSelectElement;
     // Simulate changing the dropdown selection
     fireEvent.change(dropdown, { target: { value: '20' } });
 
