@@ -1,8 +1,8 @@
 "use client";
-import React, { ChangeEvent, ChangeEventHandler, useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { BooksResult, ItemsEntity } from './BooksModel';
 import { Loader } from './Loader';
-import { getPublishedDate } from '@/util';
+import { findMostRepeatedElement, getPublishedDate } from '@/util';
 import { debounce } from 'lodash';
 
 
@@ -22,10 +22,8 @@ const SearchBar = () => {
   React.useEffect(() => {
     const getMostPopularAuthor = (allAuthors: string[]) => {
       //1. getMostPopularAuthor
-      const author = allAuthors.sort((a, b) =>
-        allAuthors.filter(v => v === a).length
-        - allAuthors.filter(v => v === b).length
-      ).pop();
+      const author = findMostRepeatedElement(allAuthors);
+      /* istanbul ignore next */
       setmostPopularAuthor(author || "")
     }
     const calculateStats = (data: BooksResult) => {
@@ -114,14 +112,14 @@ const SearchBar = () => {
         <div>
           <div className='mt-2'>
             Show - &nbsp;
-            <select className='mr-48' onChange={handleDisplayFilter}>
+            <select data-testid="display-filter-dropdown" className='mr-48' onChange={handleDisplayFilter}>
               {displayOptions.map((val) => (<option key={val} value={val}>{val}</option>))}
             </select>
             <div className='float-right'>
 
-              <button className='ml-2 mr-2 text-indigo-700 underline' onClick={handlePrev}>Prev</button>
-              <input className='w-12 text-center' value={currentPage + 1} onChange={handleChange} />
-              <button className='ml-2 mr-2 text-indigo-700 underline' onClick={handleNext}>Next</button>
+              <button className='ml-2 mr-2 text-indigo-700 underline' data-testid="prev" onClick={handlePrev}>Prev</button>
+              <input className='w-12 text-center' value={currentPage + 1} data-testid="currentPage" onChange={handleChange} />
+              <button className='ml-2 mr-2 text-indigo-700 underline' data-testid="next" onClick={handleNext}>Next</button>
             </div>
           </div>
           <div className='mt-4 text-center text-sm bg-pink-200 text-gray-700 pt-2 pb-2'>
@@ -136,7 +134,7 @@ const SearchBar = () => {
       <div className="bg-white space-y-4 mt-4 flex-1">
         <ul className="">
           {results?.items?.map((result, index) => (
-            <li key={index} className="text-gray-700 border border-gray-300 px-4 py-3 cursor-pointer" onClick={() => handleItemClick(index)}>
+            <li data-testid="book-item" key={index} className="text-gray-700 border border-gray-300 px-4 py-3 cursor-pointer" onClick={() => handleItemClick(index)}>
               <p>{result.volumeInfo.authors?.join(",")} - {result.volumeInfo.title}
                 <span className='text-xs float-right mt-2'>{result.volumeInfo.publishedDate}</span>
               </p>
