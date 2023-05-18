@@ -3,6 +3,8 @@ import React, { ChangeEvent, ChangeEventHandler, useState } from 'react';
 import { BooksResult, ItemsEntity } from './BooksModel';
 import { Loader } from './Loader';
 import { getPublishedDate } from '@/util';
+import { debounce } from 'lodash';
+
 
 const SearchBar = () => {
   const [openIndex, setopenIndex] = useState<number | null>(null);
@@ -63,7 +65,7 @@ const SearchBar = () => {
   }, [currentPage, maxResults, searchQuery])
 
 
-  const handleDisplayFilter = (event: ChangeEventHandler<HTMLSelectElement>) => {
+  const handleDisplayFilter = (event: ChangeEvent<HTMLSelectElement>) => {
     setcurrentPage(0)
     setmaxResults(parseInt(event.target.value))
   }
@@ -84,6 +86,10 @@ const SearchBar = () => {
     }
   }
 
+  const debouncedSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+  }, 500);
+
   const handleItemClick = (clickedIndex: number) => {
     if (clickedIndex === openIndex) {
       setopenIndex(null)
@@ -98,17 +104,9 @@ const SearchBar = () => {
         <input
           type="text"
           placeholder="Search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={debouncedSearch}
           className="border border-gray-300 rounded px-4 py-2"
         />
-        <button
-          type="button"
-          onClick={handleSearch}
-          className="bg-blue-500 text-white px-4 py-2 rounded ml-2"
-        >
-          Search
-        </button>
 
         {showLoader && <Loader />}
       </div>
